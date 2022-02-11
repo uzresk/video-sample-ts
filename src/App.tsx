@@ -1,24 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {HTMLAttributes, useEffect, useMemo, useRef, VideoHTMLAttributes} from 'react';
 import './App.css';
+import Hls from "hls.js"
 
-function App() {
+const App = () => {
+
+  const url = "";
+
+  const isSupportedBrowser = useMemo(() => Hls.isSupported(), [])
+  const ref = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    if (isSupportedBrowser && ref.current != null) {
+      const hls = new Hls()
+      hls.loadSource(url)
+      hls.attachMedia(ref.current)
+      return () => {
+        hls.removeAllListeners()
+        hls.stopLoad()
+      }
+    }
+  }, [])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="content">
+        {isSupportedBrowser ? (
+          <video ref={ref} width="850" controls/>
+        ) : (
+          <div>
+            not support browser
+          </div>
+        )}
+      </div>
     </div>
   );
 }
